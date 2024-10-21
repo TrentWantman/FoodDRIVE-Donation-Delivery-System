@@ -1,15 +1,30 @@
-# Frontend dependencies and build artifacts
+# Node.js dependencies
 node_modules/
-build/
-.pnp
-.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Backend dependencies
-/backend/node_modules/
-backend/node_modules/
+# Logs
+logs
+*.log
+logs/*.log
 
 # Python virtual environment
 venv/
+*.pyc
+__pycache__/
+
+# IDE/Editor directories and files
+.vscode/
+.idea/
+.DS_Store
+
+# React build output
+/build
+/dist
+
+# Test coverage
+/coverage
 
 # Environment variables
 .env
@@ -18,15 +33,36 @@ venv/
 .env.test.local
 .env.production.local
 
-# Testing
-/coverage
+# Miscellaneous files
+*.swp
+*.swo
+*.tmp
+*.bak
+Thumbs.db
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-*.log
+# Parcel cache
+.cache/
 
-# Misc
-.DS_Store
+# Static build files
+.out/
+.next/
+
+# Backend specific files
+backend/node_modules/
+backend/.env
+
+# Frontend specific files
+app/node_modules/
+app/.env
+app/.pnp
+app.pnp.js
+
+# Ignore compiled stylesheets (if using Sass/SCSS)
+/public/**/*.css.map
+
+# Ignore lock files that may vary by environment
+app/package-lock.json
+backend/package-lock.json
+
+# Ignore executable files
 powershell
