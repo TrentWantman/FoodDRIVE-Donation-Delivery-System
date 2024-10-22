@@ -6,20 +6,13 @@ import './DonationSearch.css';
 function DonationSearch() {
   const [donations, setDonations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('All');
+  const [urgency, setUrgency] = useState('All');
 
   useEffect(() => {
-    getDonationRequests().then((data) => {
+    getDonationRequests(searchTerm, urgency).then((data) => {
       setDonations(data);
     });
-  }, []);
-
-  const filteredDonations = donations.filter((donation) => {
-    return (
-      (filter === 'All' || donation.urgency === filter) &&
-      donation.item.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  }, [searchTerm, urgency]);
 
   return (
     <div>
@@ -30,7 +23,7 @@ function DonationSearch() {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+      <select value={urgency} onChange={(e) => setUrgency(e.target.value)}>
         <option value="All">All</option>
         <option value="High">High Urgency</option>
         <option value="Medium">Medium Urgency</option>
@@ -38,7 +31,7 @@ function DonationSearch() {
       </select>
 
       <ul>
-        {filteredDonations.map((donation) => (
+        {donations.map((donation) => (
           <li
           key={donation.id}
           data-urgency={donation.urgency}
