@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getDonationRequests } from '../api';
+import './DonationSearch.css';
+
 
 function DonationSearch() {
   const [donations, setDonations] = useState([]);
@@ -37,9 +39,12 @@ function DonationSearch() {
 
       <ul>
         {filteredDonations.map((donation) => (
-          <li key={donation.id}>
-            {donation.item} - {donation.location} - {donation.urgency}
-          </li>
+          <li
+          key={donation.id}
+          data-urgency={donation.urgency}
+        >
+          {donation.item} - {donation.location} - {donation.quantity} - {donation.urgency}
+        </li>
         ))}
       </ul>
     </div>
