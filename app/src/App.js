@@ -1,15 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import Home from './components/Home';
 import DonationSearch from './components/DonationSearch';
+import Login from './components/Login';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* Redirect from the root path to the Login page */}
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/donation-search" element={<DonationSearch />} />
         </Routes>
       </div>
