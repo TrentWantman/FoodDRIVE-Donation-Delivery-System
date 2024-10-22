@@ -5,7 +5,7 @@ import './Login.css';
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    // const [error, setError] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
@@ -43,10 +43,11 @@ function Login() {
                         required
                     />
                 </div>
+                {error && <div className="error-message">{error}</div>} {/* Display error message */}
                 <button type="submit">Login</button>
             </form>
         </div>
     );
-
 }
+
 export default Login;
