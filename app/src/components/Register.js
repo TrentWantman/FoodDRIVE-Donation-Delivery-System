@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { login } from '../services/authService';
+import { register } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
-function Login() {
-  const [formData, setFormData] = useState({ username: '', password: '' });
+function Register() {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    accountType: 'driver',
+  });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -12,17 +16,17 @@ function Login() {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await login(formData);
+      const res = await register(formData);
       localStorage.setItem('token', res.data.token);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response.data.msg || 'Login failed');
+      setError(err.response.data.msg || 'Registration failed');
     }
   };
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2>Register</h2>
       <form onSubmit={onSubmit}>
         <input
           name="username"
@@ -35,20 +39,26 @@ function Login() {
         <input
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder="Password (min 6 characters)"
           value={formData.password}
           onChange={onChange}
           required
         />
         <br />
-        <button type="submit">Login</button>
+        <select name="accountType" value={formData.accountType} onChange={onChange}>
+          <option value="driver">Driver</option>
+          <option value="food bank">Food Bank</option>
+          <option value="donor">Donor</option>
+        </select>
+        <br />
+        <button type="submit">Register</button>
       </form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <p>
-        Don't have an account? <a href="/register">Register here</a>
+        Already have an account? <a href="/">Login here</a>
       </p>
     </div>
   );
 }
 
-export default Login;
+export default Register;
