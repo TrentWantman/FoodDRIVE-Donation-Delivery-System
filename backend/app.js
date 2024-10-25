@@ -43,8 +43,21 @@ app.get('/', (req, res) => {
   res.send('FoodDRIVE API is running!');
 });
 
-// Existing endpoint to get donation requests (if any)
-// ...
+// Endpoint to get donation requests
+app.get('/api/donations', async (req, res) => {
+	// Get a cursor of the first 25 matching requests
+	const query = { "$regex": req.query.q || "", "$options": "i" };
+	const requests_cursor = requests_collection.find({ $or: [{ item: query }, { location: query }], ...(req.query.urgency) && { urgency: req.query.urgency } }, { limit: 25 });
+
+	// Add the returned requests to an array as we get them
+	let requests = []
+	for await (const request of requests_cursor) {
+		requests.push(request);
+	}
+
+	// Return the requests we got
+	res.json(requests);
+});
 
 // User Registration
 app.post(
