@@ -6,6 +6,7 @@ function Register() {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
+    confirmPassword: '',
     accountType: 'driver',
   });
   const [error, setError] = useState('');
@@ -15,6 +16,13 @@ function Register() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     try {
       const res = await register(formData);
       localStorage.setItem('token', res.data.token);
@@ -41,6 +49,15 @@ function Register() {
           name="password"
           placeholder="Password (min 6 characters)"
           value={formData.password}
+          onChange={onChange}
+          required
+        />
+        <br />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
           onChange={onChange}
           required
         />
