@@ -26,3 +26,6 @@ function App() {
 }
 
 export default App;
+
+
+// $env:NODE_OPTIONS="--openssl-legacy-provider"          command I need to run before npm start??
