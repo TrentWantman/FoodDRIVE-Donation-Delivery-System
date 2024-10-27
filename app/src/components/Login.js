@@ -1,6 +1,10 @@
+// src/components/Login.js
+
 import React, { useState } from 'react';
 import { login } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
+import './Login.css'; // Import your CSS file
+import Logo from './Logo';
 
 function Login() {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -21,33 +25,32 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={onSubmit}>
-        <input
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={onChange}
-          required
-        />
-        <br />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={onChange}
-          required
-        />
-        <br />
-        <button type="submit">Login</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <p>
-        Don't have an account? <a href="/register">Register here</a>
-      </p>
-    </div>
+      <div className="login-container">
+        <Logo />
+        <h2>Welcome to FoodDRIVE!<br />Login below:</h2>
+        <form onSubmit={onSubmit}>
+          <input
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={onChange}
+              required
+          />
+          <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={onChange}
+              required
+          />
+          <button type="submit">Login</button>
+        </form>
+        {error && <p className="error-message">{error}</p>}
+        <h3>
+          Don't have an account? <a href="/register">Register here</a>
+        </h3>
+      </div>
   );
 }
 

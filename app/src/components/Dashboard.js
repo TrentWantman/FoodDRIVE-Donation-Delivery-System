@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { getCurrentUser } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import './DonorDashboard.css';
+import './DriverDashboard.css';
+import './FoodBankDashboard.css';
+import Logo from './Logo';
 
 function Dashboard() {
   const [accountType, setAccountType] = useState('');
@@ -44,20 +47,110 @@ function Dashboard() {
 
 function DriverDashboard() {
   return (
-    <div>
-      <h2>Driver Dashboard</h2>
-      <p>Welcome to your dashboard.</p>
-    </div>
+      <div className="driver-dashboard-container">
+        <Logo />
+        <h2>Driver Dashboard</h2>
+        <p>Welcome to your dashboard.</p>
+        <div className="available-deliveries">
+          <h3>Available Deliveries:</h3>
+          <p>No deliveries near you</p>
+        </div>
+      </div>
   );
 }
 
+
 function FoodBankDashboard() {
-  return (
-    <div>
-      <h2>Food Bank Dashboard</h2>
-      <p>Welcome to your dashboard.</p>
-    </div>
-  );
+    const [formVisible, setFormVisible] = useState(false);
+    const [donationRequest, setDonationRequest] = useState({
+        foodBankName: '',
+        requestedItem: '',
+        quantity: '',
+        urgency: 'low',
+    });
+
+    const [donationRequests, setDonationRequests] = useState([]); // State to hold donation requests
+
+    const toggleForm = () => setFormVisible(!formVisible);
+
+    const onChange = (e) => setDonationRequest({ ...donationRequest, [e.target.name]: e.target.value });
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+        if (donationRequest.foodBankName && donationRequest.requestedItem && donationRequest.quantity) {
+            // Add the new request to the donation requests state
+            setDonationRequests([...donationRequests, donationRequest]);
+
+            // Reset form and hide it
+            setDonationRequest({ foodBankName: '', requestedItem: '', quantity: '', urgency: 'low' });
+            setFormVisible(false);
+        }
+    };
+
+    return (
+        <div className="food-bank-dashboard-container">
+            <Logo />
+            <h2>Food Bank Dashboard</h2>
+            <p>Welcome to your dashboard.</p>
+            <div className="donation-requests">
+                <h3>Donation Requests:</h3>
+                {donationRequests.length === 0 ? (
+                    <p>No donation requests available at this time.</p>
+                ) : (
+                    <ul>
+                        {donationRequests.map((request, index) => (
+                            <li key={index}>
+                                <strong>Food Bank:</strong> {request.foodBankName} <br />
+                                <strong>Requested Item:</strong> {request.requestedItem} <br />
+                                <strong>Quantity:</strong> {request.quantity} <br />
+                                <strong>Urgency:</strong> {request.urgency}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            <button onClick={toggleForm} className="add-request-button">
+                {formVisible ? 'Cancel' : 'Add Donation Request'}
+            </button>
+
+            {formVisible && (
+                <form onSubmit={onSubmit} className="donation-request-form">
+                    <input
+                        type="text"
+                        name="foodBankName"
+                        placeholder="Food Bank Name"
+                        value={donationRequest.foodBankName}
+                        onChange={onChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="requestedItem"
+                        placeholder="Requested Item"
+                        value={donationRequest.requestedItem}
+                        onChange={onChange}
+                        required
+                    />
+                    <input
+                        type="number"
+                        name="quantity"
+                        placeholder="Quantity"
+                        value={donationRequest.quantity}
+                        onChange={onChange}
+                        required
+                    />
+                    <select name="urgency" value={donationRequest.urgency} onChange={onChange}>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <button type="submit">Submit Request</button>
+                </form>
+            )}
+        </div>
+    );
 }
 
 function DonorDashboard() {
@@ -77,7 +170,7 @@ function DonorDashboard() {
         quantity: itemQuantity,
         weight: itemWeight,
         expirationDate: expirationDate || 'N/A',
-        image: image, // In a real application, you'd handle image uploads differently
+        image: image,
       };
       setDonationItems([...donationItems, newItem]);
       // Reset form fields
@@ -99,6 +192,7 @@ function DonorDashboard() {
 
   return (
       <div className="donor-dashboard">
+        <Logo />
         <h2>Donor Dashboard</h2>
         <p>Welcome to your dashboard.</p>
 

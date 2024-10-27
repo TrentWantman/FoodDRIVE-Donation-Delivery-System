@@ -16,7 +16,7 @@ function App() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<Home />} />
           <Route path="/donation-search" element={<DonationSearch />} />
         </Routes>
@@ -28,4 +28,3 @@ function App() {
 export default App;
 
 
-// $env:NODE_OPTIONS="--openssl-legacy-provider"          command I need to run before npm start??
