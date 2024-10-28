@@ -97,7 +97,7 @@ function FoodBankDashboard() {
             <div className="donation-requests">
                 <h3>Donation Requests:</h3>
                 {donationRequests.length === 0 ? (
-                    <p>No donation requests available at this time.</p>
+                    <p>No active donation requests at this time.</p>
                 ) : (
                     <ul>
                         {donationRequests.map((request, index) => (
