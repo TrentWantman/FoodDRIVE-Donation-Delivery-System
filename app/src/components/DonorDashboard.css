@@ -55,3 +55,39 @@
     border-radius: 4px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
 }
+
+.food-bank-requests {
+    margin-top: 2rem;
+}
+
+.food-bank-requests ul {
+    list-style: none;
+    padding: 0;
+}
+
+.food-bank-requests li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 0.5rem;
+}
+
+.food-bank-requests li strong {
+    color: #333;
+}
+
+.donation-items-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+
+.donation-items-box h3 {
+    margin-top: 0;
+}
+
+.donation-items-box p,
+.donation-items-box ul {
+    margin: 0;
+}

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './DonorDashboard.css';
 import './DriverDashboard.css';
 import './FoodBankDashboard.css';
+import { getDonationRequests } from "../api";
 import Logo from './Logo';
 
 function Dashboard() {
@@ -161,6 +162,7 @@ function DonorDashboard() {
   const [expirationDate, setExpirationDate] = useState('');
   const [image, setImage] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [donationRequests, setDonationRequests] = useState([]);
 
   const handleAddDonation = (e) => {
     e.preventDefault();
@@ -190,65 +192,106 @@ function DonorDashboard() {
     }
   };
 
+    useEffect(() => {
+        async function fetchAndSortRequests() {
+            const requests = await getDonationRequests();
+
+            // Sort requests by urgency (High first, then Medium, then Low)
+            const sortedRequests = requests.sort((a, b) => {
+                const urgencyOrder = { High: 1, Medium: 2, Low: 3 };
+                return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
+            });
+
+            setDonationRequests(sortedRequests);
+        }
+
+        fetchAndSortRequests();
+    }, []);
+
   return (
       <div className="donor-dashboard">
-        <Logo />
-        <h2>Donor Dashboard</h2>
-        <p>Welcome to your dashboard.</p>
+          <Logo/>
+          <h2>Donor Dashboard</h2>
+          <p>Welcome to your dashboard.</p>
 
-        <button onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : 'Add Donation Item'}
-        </button>
+          <button onClick={() => setShowForm(!showForm)}>
+              {showForm ? 'Cancel' : 'Add Donation Item'}
+          </button>
 
-        {showForm && (
-            <form onSubmit={handleAddDonation}>
-              <input
-                  type="text"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  placeholder="Item Name"
-                  required
-              />
-              <input
-                  type="number"
-                  value={itemQuantity}
-                  onChange={(e) => setItemQuantity(e.target.value)}
-                  placeholder="Item Quantity"
-                  required
-              />
-              <input
-                  type="number"
-                  value={itemWeight}
-                  onChange={(e) => setItemWeight(e.target.value)}
-                  placeholder="Item Weight (oz)"
-                  required
-              />
-              <input
-                  type="text"
-                  value={expirationDate}
-                  onChange={(e) => setExpirationDate(e.target.value)}
-                  placeholder="Expiration Date (MM/DD/YYY, N/A if not listed)"
-              />
-              <input
-                  type="file"
-                  onChange={handleImageChange}
-                  accept="image/*"
-                  required
-              />
-              {image && <img src={image} alt="Item preview" style={{ width: '100px', height: '100px' }} />}
-              <button type="submit">Submit</button>
-            </form>
-        )}
+          {showForm && (
+              <form onSubmit={handleAddDonation}>
+                  <input
+                      type="text"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      placeholder="Item Name"
+                      required
+                  />
+                  <input
+                      type="number"
+                      value={itemQuantity}
+                      onChange={(e) => setItemQuantity(e.target.value)}
+                      placeholder="Item Quantity"
+                      required
+                  />
+                  <input
+                      type="number"
+                      value={itemWeight}
+                      onChange={(e) => setItemWeight(e.target.value)}
+                      placeholder="Item Weight (oz)"
+                      required
+                  />
+                  <input
+                      type="text"
+                      value={expirationDate}
+                      onChange={(e) => setExpirationDate(e.target.value)}
+                      placeholder="Expiration Date (MM/DD/YYY, N/A if not listed)"
+                  />
+                  <input
+                      type="file"
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      required
+                  />
+                  {image && <img src={image} alt="Item preview" style={{width: '100px', height: '100px'}}/>}
+                  <button type="submit">Submit</button>
+              </form>
+          )}
 
-        <h3>Your Donation Items:</h3>
-        <ul>
-          {donationItems.map((item, index) => (
-              <li key={index}>
-                {item.name} - Quantity: {item.quantity}, Weight: {item.weight} oz, Expiration Date: {item.expirationDate}
-                {item.image && <img src={item.image} alt="Item" style={{ width: '50px', height: '50px' }} />}
-              </li>
-          ))}
-        </ul>
+          <div className="donation-items-box">
+              <h3>Your Donation Items:</h3>
+              {donationItems.length === 0 ? (
+                  <p>No items listed for donation</p>
+              ) : (
+                  <ul>
+                      {donationItems.map((item, index) => (
+                          <li key={index}>
+                              {item.name} - Quantity: {item.quantity}, Weight: {item.weight} oz, Expiration
+                              Date: {item.expirationDate}
+                              {item.image && <img src={item.image} alt="Item" style={{width: '50px', height: '50px'}}/>}
+                          </li>
+                      ))}
+                  </ul>
+              )}
+          </div>
+
+          {/* Food Bank Requests Section */}
+          <div className="food-bank-requests">
+              <h3>Food Bank Requests</h3>
+              {donationRequests.length === 0 ? (
+                  <p>No donation requests at the moment.</p>
+              ) : (
+                  <ul>
+                      {donationRequests.map((request) => (
+                          <li key={request.id}>
+                              <strong>{request.item}</strong> - {request.quantity} needed
+                              <br/>
+                              Urgency: {request.urgency} - Location: {request.location}
+                          </li>
+                      ))}
+                  </ul>
+              )}
+          </div>
       </div>
   );
 }
