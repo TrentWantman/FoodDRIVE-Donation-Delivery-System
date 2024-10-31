@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCurrentUser } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './DonorDashboard.css';
 import './DriverDashboard.css';
 import './FoodBankDashboard.css';
@@ -196,13 +196,9 @@ function DonorDashboard() {
         async function fetchAndSortRequests() {
             const requests = await getDonationRequests();
 
-            // Sort requests by urgency (High first, then Medium, then Low)
-            const sortedRequests = requests.sort((a, b) => {
-                const urgencyOrder = { High: 1, Medium: 2, Low: 3 };
-                return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
-            });
-
-            setDonationRequests(sortedRequests);
+            // Filter for only high urgency requests
+            const highUrgencyRequests = requests.filter(request => request.urgency === 'High');
+            setDonationRequests(highUrgencyRequests);
         }
 
         fetchAndSortRequests();
@@ -277,7 +273,7 @@ function DonorDashboard() {
 
           {/* Food Bank Requests Section */}
           <div className="food-bank-requests">
-              <h3>Food Bank Requests</h3>
+              <h3>High Urgency Food Bank Requests</h3>
               {donationRequests.length === 0 ? (
                   <p>No donation requests at the moment.</p>
               ) : (
@@ -292,6 +288,9 @@ function DonorDashboard() {
                   </ul>
               )}
           </div>
+          <Link to="/donation-search">
+              <button className="home-button">See all food bank requests</button>
+          </Link>
       </div>
   );
 }
