@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getDonationRequests } from '../api';
+import { Link } from 'react-router-dom';
 import './DonationSearch.css';
+import Logo from "./Logo";
 
 
 function DonationSearch() {
@@ -16,6 +18,9 @@ function DonationSearch() {
 
   return (
     <div>
+      <Link to="/dashboard">
+        <Logo />
+      </Link>
       <h2>Donation Requests</h2>
       <input
         type="text"

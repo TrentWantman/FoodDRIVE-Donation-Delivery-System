@@ -8,8 +8,8 @@ function Home() {
     <div className="home-container">
       <h1>Welcome to FoodDRIVE</h1>
       <p>Our platform helps connect food banks with donors</p>
-      <Link to="/donation-search">
-        <button className="home-button">Go to Donation Search</button>
+      <Link to="/dashboard">
+        <button className="home-button">Go to Dashboard</button>
       </Link>
     </div>
   );
