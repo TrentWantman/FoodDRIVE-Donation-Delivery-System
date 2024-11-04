@@ -3,18 +3,19 @@ import { getDonationRequests } from '../api';
 import { Link } from 'react-router-dom';
 import './DonationSearch.css';
 import Logo from "./Logo";
+import DonationRequestList from './DonationRequestList';
 
 
 function DonationSearch() {
-  const [donations, setDonations] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [urgency, setUrgency] = useState('All');
+	const [donations, setDonations] = useState([]);
+	const [searchTerm, setSearchTerm] = useState('');
+	const [urgency, setUrgency] = useState('All');
 
-  useEffect(() => {
-    getDonationRequests(searchTerm, urgency).then((data) => {
-      setDonations(data);
-    });
-  }, [searchTerm, urgency]);
+	useEffect(() => {
+		getDonationRequests(searchTerm, urgency).then((data) => {
+			setDonations(data);
+		});
+	}, [searchTerm, urgency]);
 
   return (
     <div>
@@ -35,18 +36,9 @@ function DonationSearch() {
         <option value="Low">Low Urgency</option>
       </select>
 
-      <ul>
-        {donations.map((donation) => (
-          <li
-          key={donation.id}
-          data-urgency={donation.urgency}
-        >
-          {donation.item} - {donation.location} - {donation.quantity} - {donation.urgency}
-        </li>
-        ))}
-      </ul>
-    </div>
-  );
+			<DonationRequestList requests={donations} />
+		</div>
+	);
 }
 
 export default DonationSearch; // Ensure it's a default export
