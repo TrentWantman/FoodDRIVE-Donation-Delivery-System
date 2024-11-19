@@ -1,56 +1,91 @@
-.login-container {
-    max-width: 400px;
+/* Global styles for the page background */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(180deg, rgb(35, 21, 114), rgb(208, 207, 214));
+    font-family: 'Arial', sans-serif;
+    z-index: -1;
+
+  }
+
+  .RegisterText {
+    padding-top: 20px;
+  }
+  
+  /* The login container styling */
+  .login-container {
+    background-color: #f8f9fa;
     margin: auto;
     padding: 2rem;
     border: 1px solid #ccc;
     border-radius: 8px;
-    background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.login-container h2 {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centers the box vertically and horizontally */
+  }
+  
+  /* Heading styles */
+  .login-container h2 {
     text-align: center;
     margin-bottom: 1rem;
-}
-
-.login-container form {
+  }
+  
+  /* Form styles */
+  .login-container form {
     display: flex;
     flex-direction: column;
-}
-
-.login-container input {
+  }
+  
+  /* Input fields styling */
+  .login-container input {
     margin-bottom: 1rem;
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: border-color 0.3s;
-}
-
-.login-container input:focus {
-    border-color: #007bff; /* Change border color on focus */
-}
-
-.login-container button {
+  }
+  
+  .login-container input:focus {
+    border-color: #007bff;
+  }
+  
+  /* Button styling */
+  .login-container button {
     padding: 0.5rem;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s; /* Add transition for smoother hover effect */
-}
-
-.login-container button:hover {
+    transition: background-color 0.3s;
+  }
+  
+  .login-container button:hover {
     background-color: #0056b3;
-}
-
-.error-message {
+  }
+  
+  /* Error message styling */
+  .error-message {
     color: red;
     text-align: center;
-    margin-top: 1rem; /* Add margin for spacing */
-}
-
-.login-container p {
+    margin-top: 1rem;
+  }
+  
+  /* Footer text */
+  .login-container p {
     text-align: center;
-}
-
+  }
+  /* Optional: Add responsiveness for mobile view */
+  @media (max-width: 500px) {
+    .login-container {
+      width: 90%;
+      padding: 1.5rem;
+    }
+  
+    .login-container h2 {
+      font-size: 1.5rem;
+    }
+  }

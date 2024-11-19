@@ -1,9 +1,7 @@
-// src/components/Login.js
-
 import React, { useState } from 'react';
 import { login } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Import your CSS file
+import './Login.css';
 import Logo from './Logo';
 
 function Login() {
@@ -47,7 +45,7 @@ function Login() {
           <button type="submit">Login</button>
         </form>
         {error && <p className="error-message">{error}</p>}
-        <h3>
+        <h3 className='RegisterText'>
           Don't have an account? <a href="/register">Register here</a>
         </h3>
       </div>

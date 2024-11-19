@@ -18,7 +18,7 @@ function DonationSearch() {
 	}, [searchTerm, urgency]);
 
   return (
-    <div>
+    <div className='container'>
       <Link to="/dashboard">
         <Logo />
       </Link>
