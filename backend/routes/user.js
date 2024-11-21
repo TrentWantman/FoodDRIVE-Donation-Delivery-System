@@ -9,6 +9,7 @@ router.post('/donationRequests', [
 	body('requestedItem').notEmpty(),
 	body('quantity').notEmpty().isNumeric(),
 	body('urgency').isIn(['Low', 'Medium', 'High'],),
+	body('address').notEmpty(),
 	auth
 ], async (req, res) => {
 	const errors = validationResult(req);
@@ -17,7 +18,7 @@ router.post('/donationRequests', [
 	}
 
 	try {
-		await addDonationRequest(req.body.foodBankName, req.body.requestedItem, req.body.quantity, req.body.urgency, req.user.userId);
+		await addDonationRequest(req.body.foodBankName, req.body.requestedItem, req.body.quantity, req.body.urgency, req.body.address, req.user.userId);
 		res.json({});
 	} catch (err) {
 		console.error('Error during /donationReqeusts:', err);

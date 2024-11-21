@@ -10,7 +10,7 @@ function DonationRequestList(params) {
 						key={request._id}
 						data-urgency={request.urgency}
 					>
-						{request.requestedItem} - {request.foodBankName} - {request.quantity} - {request.urgency}
+						{request.requestedItem} - {request.foodBankName} - {request.quantity} - {request.urgency} - {request.address}
 					</li>
 				))}
 			</ul>

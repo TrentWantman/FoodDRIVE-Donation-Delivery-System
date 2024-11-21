@@ -45,12 +45,13 @@ async function addUser(username, passwordHash, accountType) {
 	}).insertedId;
 }
 
-async function addDonationRequest(foodBankName, requestedItem, quantity, urgency, userId) {
+async function addDonationRequest(foodBankName, requestedItem, quantity, urgency, address, userId) {
 	return await requests_collection.insertOne({
 		foodBankName,
 		requestedItem,
 		quantity,
 		urgency,
+		address,
 		userId
 	});
 }
