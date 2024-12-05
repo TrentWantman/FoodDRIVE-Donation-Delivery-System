@@ -2,104 +2,166 @@ import React, { useState, useEffect } from 'react';
 import Logo from './Logo';
 import { postUserDontationReqeust, getUserDonationRequests } from '../api';
 import DonationRequestList from './DonationRequestList';
-import { LoadScript, Autocomplete } from '@react-google-maps/api';
-
-const libraries = ['places'];
+import { Autocomplete } from '@react-google-maps/api';
 
 function FoodBankDashboard() {
-	const [formVisible, setFormVisible] = useState(false);
-	const [donationRequests, setDonationRequests] = useState([]); // State to hold donation requests
-	const [address, setAddress] = useState(''); // State to store the selected address
-	let autocomplete = null; // Variable to hold autocomplete instance
+  const [formVisible, setFormVisible] = useState(false);
+  const [donationRequests, setDonationRequests] = useState([]);
+  const [address, setAddress] = useState('');
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [formData, setFormData] = useState({
+    foodBankName: '',
+    requestedItem: '',
+    quantity: '',
+    urgency: 'Low',
+  });
 
-	const updateDonations = async () => {
-		setDonationRequests(await getUserDonationRequests());
-	};
+  let autocomplete = null;
 
-	const toggleForm = () => setFormVisible(!formVisible);
+  const updateDonations = async () => {
+    setDonationRequests(await getUserDonationRequests());
+  };
 
-	const onSubmit = async (e) => {
-		e.preventDefault();
-		const formData = Object.fromEntries(new FormData(e.target));
-		console.log('Form Data Submitted:', formData);
-		e.target.reset();
-		setFormVisible(false);
-		await postUserDontationReqeust(formData);
-		await updateDonations();
-	};
+  const toggleForm = () => setFormVisible(!formVisible);
 
-	const handlePlaceChanged = () => {
-		if (autocomplete) {
-			const place = autocomplete.getPlace();
-			setAddress(place.formatted_address || '');
-		}
-	};
+  useEffect(() => {
+    updateDonations();
+  }, []);
 
-	useEffect(() => {
-		updateDonations();
-	}, []);
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-	return (
-		<div className="food-bank-dashboard-container">
-			<Logo />
-			<h2>Food Bank Dashboard</h2>
-			<p>Welcome to your dashboard.</p>
-			<DonationRequestList requests={donationRequests} />
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (!address) {
+      setShowAddressModal(true);
+    } else {
+      submitFullRequest();
+    }
+  };
 
-			<button onClick={toggleForm} className="add-request-button">
-				{formVisible ? 'Cancel' : 'Add Donation Request'}
-			</button>
+  const submitFullRequest = async () => {
+    const fullData = { ...formData, address };
+    await postUserDontationReqeust(fullData);
+    setFormVisible(false);
+    setAddress('');
+    setFormData({
+      foodBankName: '',
+      requestedItem: '',
+      quantity: '',
+      urgency: 'Low',
+    });
+    await updateDonations();
+  };
 
-			{formVisible && (
-				<LoadScript
-					googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-					libraries={libraries}
-				>
-					<form onSubmit={onSubmit} className="donation-request-form">
-						<input
-							type="text"
-							name="foodBankName"
-							placeholder="Food Bank Name"
-							required
-						/>
-						<input
-							type="text"
-							name="requestedItem"
-							placeholder="Requested Item"
-							required
-						/>
-						<input
-							type="number"
-							name="quantity"
-							placeholder="Quantity"
-							required
-						/>
-						<select name="urgency">
-							<option value="Low">Low</option>
-							<option value="Medium">Medium</option>
-							<option value="High">High</option>
-						</select>
-						<Autocomplete
-							onLoad={(ref) => (autocomplete = ref)}
-							onPlaceChanged={handlePlaceChanged}
-						>
-							<div style={{ width: '400%' }}>
-								<input
-									type="text"
-									placeholder="Enter Address"
-									name="address"
-									required
-									onChange={(e) => setAddress(e.target.value)}
-									style={{ width: '100%' }} // Ensure the input takes full width of the container
-								/>
-							</div>
-						</Autocomplete>
-						<button type="submit">Submit Request</button>
-					</form>
-				</LoadScript>
-			)}
-		</div>
-	);
+  const handlePlaceChanged = () => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place && place.formatted_address) {
+        const trimmedAddress = place.formatted_address.replace(/, USA$/, '');
+        setAddress(trimmedAddress);
+      }
+    }
+  };
+
+  const handleAddressSubmit = () => {
+    if (address) {
+      setShowAddressModal(false);
+      submitFullRequest();
+    } else {
+      alert('Please select an address from the suggestions.');
+    }
+  };
+
+  return (
+    <div className="food-bank-dashboard-container">
+      <Logo />
+      <h2>Food Bank Dashboard</h2>
+      <p>Welcome to your dashboard.</p>
+      <DonationRequestList requests={donationRequests} />
+
+      <button onClick={toggleForm} className="add-request-button">
+        {formVisible ? 'Cancel' : 'Add Donation Request'}
+      </button>
+
+      {formVisible && (
+        <form onSubmit={onSubmit} className="donation-request-form">
+          <input
+            type="text"
+            name="foodBankName"
+            placeholder="Food Bank Name"
+            required
+            value={formData.foodBankName}
+            onChange={handleFormChange}
+          />
+          <input
+            type="text"
+            name="requestedItem"
+            placeholder="Requested Item"
+            required
+            value={formData.requestedItem}
+            onChange={handleFormChange}
+          />
+          <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity"
+            required
+            value={formData.quantity}
+            onChange={handleFormChange}
+          />
+          <select
+            name="urgency"
+            value={formData.urgency}
+            onChange={handleFormChange}
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+          <input type="hidden" name="address" value={address} />
+          <button type="submit">Submit Request</button>
+        </form>
+      )}
+
+      {showAddressModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Please Enter Your Address</h3>
+            <Autocomplete
+              onLoad={(ref) => (autocomplete = ref)}
+              onPlaceChanged={handlePlaceChanged}
+              fields={['formatted_address', 'address_components', 'geometry']}
+            >
+              <input
+                type="text"
+                placeholder="Enter Address"
+                className="address-input"
+              />
+            </Autocomplete>
+            <div className="modal-actions">
+              <button
+                type="button"
+                onClick={handleAddressSubmit}
+                className="modal-confirm-button"
+              >
+                Confirm Address
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddressModal(false)}
+                className="modal-cancel-button"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default FoodBankDashboard;
