@@ -10,7 +10,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const auth = require('./authMiddleware');
-const { getUser, getUserByUserId, getDonationRequests } = require('./db');
+const { getUser, getUserByUserId, getDonationRequests, createPickupRequest} = require('./db');
 
 const PORT = process.env.PORT || 5000;
 
@@ -30,6 +30,26 @@ app.use('/api/user', require('./routes/user'));
 // Simple route to test the server
 app.get('/', (req, res) => {
 	res.send('FoodDRIVE API is running!');
+});
+
+// Endpoint to commit a donation: creates a new pickup request
+app.post('/api/donations/commit', auth, async (req, res) => {
+	const { id, pickupAddress, quantity } = req.body;
+
+	if (!id || !pickupAddress || !quantity) {
+		return res.status(400).json({ error: 'Missing id, pickupAddress, or quantity' });
+	}
+
+	try {
+		const insertedId = await createPickupRequest(id, pickupAddress, quantity);
+		res.json({ message: 'Pickup request created successfully', pickupRequestId: insertedId });
+	} catch (error) {
+		console.error('Error creating pickup request:', error);
+		if (error.message === "Original request not found") {
+			return res.status(404).json({ error: 'Original request not found' });
+		}
+		res.status(500).json({ error: 'Internal server error' });
+	}
 });
 
 // Endpoint to get donation requests

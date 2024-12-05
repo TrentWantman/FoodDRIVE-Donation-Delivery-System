@@ -31,3 +31,12 @@ export const getUserDonationRequests = async () => {
 		return [];
 	}
 }
+
+export const commitDonation = async (id, pickupAddress, quantity) => {
+	try {
+	  await axios.post(`${API_URL}/api/donations/commit`, { id, pickupAddress, quantity }, { withCredentials: true });
+	} catch (error) {
+	  console.error("Error committing donation:", error);
+	  throw error;
+	}
+  };

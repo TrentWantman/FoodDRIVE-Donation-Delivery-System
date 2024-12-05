@@ -36,7 +36,7 @@ function DonationSearch() {
         <option value="Low">Low Urgency</option>
       </select>
 
-			<DonationRequestList requests={donations} />
+			<DonationRequestList requests={donations} userType="donor"/>
 		</div>
 	);
 }

@@ -174,9 +174,8 @@ function DonorDashboard() {
 			</div>
 
 			{/* Food Bank Requests Section */}
-			<DonationRequestList requests={donationRequests} />
 			<Link to="/donation-search">
-				<button className="home-button">See all food bank requests</button>
+				<button className="home-button">See food bank requests</button>
 			</Link>
 		</div>
 	);
