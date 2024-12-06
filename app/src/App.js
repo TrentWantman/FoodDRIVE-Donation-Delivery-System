@@ -6,6 +6,8 @@ import DonationSearch from './components/DonationSearch';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import Header from './components/Header';
+
 import { LoadScript } from '@react-google-maps/api';
 
 const libraries = ['places', 'geometry'];
