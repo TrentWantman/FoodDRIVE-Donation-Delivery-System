@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { commitDonation } from '../api';
 import { Autocomplete } from '@react-google-maps/api';
 
-function DonationRequestList({ requests, userType }) {
+function PickupRequestsList({ pickupRequests, userType }) {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showCommitForm, setShowCommitForm] = useState(false);
 
-  // Separate states for typed and final
   const [typedAddress, setTypedAddress] = useState('');
   const [finalAddress, setFinalAddress] = useState('');
 
   const [commitQuantity, setCommitQuantity] = useState('');
-  
+
   let pickupAutocomplete = null;
 
   const handleItemClick = (request) => {
@@ -35,7 +34,6 @@ function DonationRequestList({ requests, userType }) {
   };
 
   const handleCommitDonation = async () => {
-    // Use finalAddress if it exists, otherwise typedAddress
     const addressToUse = finalAddress || typedAddress;
 
     if (!addressToUse || !commitQuantity) {
@@ -45,7 +43,7 @@ function DonationRequestList({ requests, userType }) {
 
     try {
       await commitDonation(selectedRequest._id, addressToUse, commitQuantity);
-      alert("Pickup request created successfully!");
+      alert("Pickup request updated successfully!");
       handleCloseModal();
     } catch (error) {
       console.error("Error committing donation:", error);
@@ -58,7 +56,6 @@ function DonationRequestList({ requests, userType }) {
       const place = pickupAutocomplete.getPlace();
       if (place && place.formatted_address) {
         const fullAddress = place.formatted_address.replace(/, USA$/, '');
-        // Update both typed and final addresses to the fully selected address
         setTypedAddress(fullAddress);
         setFinalAddress(fullAddress);
       }
@@ -67,16 +64,16 @@ function DonationRequestList({ requests, userType }) {
 
   return (
     <div>
-      <h2>Donation Requests</h2>
+      <h2>Pickup Requests</h2>
       <ul>
-        {requests.map((request) => (
+        {pickupRequests.map((request) => (
           <li
             key={request._id}
             data-urgency={request.urgency}
             onClick={() => handleItemClick(request)}
             style={{ cursor: 'pointer' }}
           >
-            {request.requestedItem} - {request.foodBankName} - {request.quantity} - {request.urgency} - {request.address}
+            {request.requestedItem} - {request.foodBankName} - {request.committedQuantity} - {request.urgency} - {request.address}
           </li>
         ))}
       </ul>
@@ -87,9 +84,10 @@ function DonationRequestList({ requests, userType }) {
             <h3>Request Details</h3>
             <p><strong>Requested Item:</strong> {selectedRequest.requestedItem}</p>
             <p><strong>Food Bank Name:</strong> {selectedRequest.foodBankName}</p>
-            <p><strong>Quantity:</strong> {selectedRequest.quantity}</p>
+            <p><strong>Quantity:</strong> {selectedRequest.commitedQuantity}</p>
             <p><strong>Urgency:</strong> {selectedRequest.urgency}</p>
-            <p><strong>Address:</strong> {selectedRequest.address}</p>
+            <p><strong>Pickup Address:</strong> {selectedRequest.pickupAddress}</p>
+            <p><strong>Dropoff Address:</strong> {selectedRequest.address}</p>
 
             {userType === 'donor' && !showCommitForm && (
               <button onClick={handleShowCommitForm} className="modal-commit-button">
@@ -99,14 +97,14 @@ function DonationRequestList({ requests, userType }) {
 
             {userType === 'donor' && showCommitForm && (
               <div className="commit-form">
-				<input
+                <input
                   type="number"
                   placeholder="Quantity"
                   value={commitQuantity}
                   onChange={(e) => setCommitQuantity(e.target.value)}
                   className="commit-form-input"
                 />
-				
+
                 <div className="autocomplete-container">
                   <Autocomplete
                     onLoad={(ref) => (pickupAutocomplete = ref)}
@@ -236,4 +234,4 @@ function DonationRequestList({ requests, userType }) {
   );
 }
 
-export default DonationRequestList;
+export default PickupRequestsList;

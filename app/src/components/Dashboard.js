@@ -6,6 +6,7 @@ import './DriverDashboard.css';
 import './FoodBankDashboard.css';
 import { getDonationRequests } from "../api";
 import FoodBankDashboard from './FoodBankDashboard';
+import DriverDashboard from './DriverDashboard';
 import DonationRequestList from './DonationRequestList';
 import Logo from './Logo';
 
@@ -42,19 +43,6 @@ function Dashboard() {
 	}
 }
 
-function DriverDashboard() {
-	return (
-		<div className="driver-dashboard-container">
-			<Logo />
-			<h2>Driver Dashboard</h2>
-			<p>Welcome to your dashboard.</p>
-			<div className="available-deliveries">
-				<h3>Available Deliveries:</h3>
-				<p>No deliveries near you</p>
-			</div>
-		</div>
-	);
-}
 
 function DonorDashboard() {
 	const [donationItems, setDonationItems] = useState([]);
@@ -174,9 +162,8 @@ function DonorDashboard() {
 			</div>
 
 			{/* Food Bank Requests Section */}
-			<DonationRequestList requests={donationRequests} />
 			<Link to="/donation-search">
-				<button className="home-button">See all food bank requests</button>
+				<button className="home-button">See food bank requests</button>
 			</Link>
 		</div>
 	);
