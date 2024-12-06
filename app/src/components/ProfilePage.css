@@ -1,0 +1,41 @@
+/* ProfilePage.css */
+
+/* Container for the form to control the width */
+.form-container {
+    max-width: 500px; /* Limit the width of the form */
+    margin: 40px auto;   /* Add margin-top to push the form down, and center it horizontally */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for input fields */
+.input-field {
+    width: 100%;  /* Make the input take full width within the container */
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Button styling */
+button {
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Error message styling */
+p {
+    color: red;
+    font-size: 14px;
+}

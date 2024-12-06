@@ -7,6 +7,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
+import ProfilePage from './components/ProfilePage';
 
 import { LoadScript } from '@react-google-maps/api';
 
@@ -19,6 +20,7 @@ function App() {
       libraries={libraries}
     >
       <Router>
+        <Header />
         <div className="App">
           <Routes>
             {/* Redirect from the root path to the Login page */}
@@ -28,6 +30,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/home" element={<Home />} />
             <Route path="/donation-search" element={<DonationSearch />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </div>
       </Router>
