@@ -5,87 +5,12 @@ import { Autocomplete } from '@react-google-maps/api';
 function DonationRequestList({ requests, userType }) {
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  // Modal states
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showQuantityModal, setShowQuantityModal] = useState(false);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [showThankYouModal, setShowThankYouModal] = useState(false);
-
-  // Input states
-  const [commitQuantity, setCommitQuantity] = useState('');
-  const [typedAddress, setTypedAddress] = useState('');
-  const [finalAddress, setFinalAddress] = useState('');
-  let pickupAutocomplete = null;
-
   const handleItemClick = (request) => {
     setSelectedRequest(request);
-    setShowDetailsModal(true);
   };
 
   const handleCloseAll = () => {
     setSelectedRequest(null);
-    setShowDetailsModal(false);
-    setShowQuantityModal(false);
-    setShowAddressModal(false);
-    setShowThankYouModal(false);
-    setCommitQuantity('');
-    setTypedAddress('');
-    setFinalAddress('');
-  };
-
-  const handleShowQuantityModal = () => {
-    // Close details modal, open quantity modal
-    setShowDetailsModal(false);
-    setShowQuantityModal(true);
-    setCommitQuantity('');
-  };
-
-  const handleQuantitySubmit = () => {
-    if (!commitQuantity) {
-      alert("Please enter a quantity.");
-      return;
-    }
-    // Close quantity modal, open address modal
-    setShowQuantityModal(false);
-    setShowAddressModal(true);
-    setTypedAddress('');
-    setFinalAddress('');
-  };
-
-  const handlePickupPlaceChanged = () => {
-    if (pickupAutocomplete) {
-      const place = pickupAutocomplete.getPlace();
-      if (place && place.formatted_address) {
-        // Use the full formatted address without trimming
-        // If you want to remove ", USA", you can do so here
-        const fullAddress = place.formatted_address;
-        setTypedAddress(fullAddress);
-        setFinalAddress(fullAddress);
-      }
-    }
-  };
-
-  const handleAddressConfirm = async () => {
-    if (!finalAddress || !commitQuantity) {
-      alert("Please select an address and ensure quantity is set.");
-      return;
-    }
-
-    try {
-      // Commit the donation
-      await commitDonation(selectedRequest._id, finalAddress, commitQuantity);
-      // Close address modal and open thank you modal
-      setShowAddressModal(false);
-      setShowThankYouModal(true);
-    } catch (error) {
-      console.error("Error committing donation:", error);
-      alert("Error committing donation. Please try again.");
-    }
-  };
-
-  const handleCloseThankYouModal = () => {
-    // Close all and reset state
-    handleCloseAll();
   };
 
   return (
@@ -114,6 +39,44 @@ function DonationRequestList({ requests, userType }) {
             <p><strong>Quantity:</strong> {selectedRequest.quantity}</p>
             <p><strong>Urgency:</strong> {selectedRequest.urgency}</p>
             <p><strong>Address:</strong> {selectedRequest.address}</p>
+
+            {userType === 'donor' && !showCommitForm && (
+              <button onClick={handleShowCommitForm} className="modal-commit-button">
+                Commit Donation
+              </button>
+            )}
+
+            {userType === 'donor' && showCommitForm && (
+              <div className="commit-form">
+				<input
+                  type="number"
+                  placeholder="Quantity"
+                  value={commitQuantity}
+                  onChange={(e) => setCommitQuantity(e.target.value)}
+                  className="commit-form-input"
+                />
+				
+                <div className="autocomplete-container">
+                  <Autocomplete
+                    onLoad={(ref) => (pickupAutocomplete = ref)}
+                    onPlaceChanged={handlePickupPlaceChanged}
+                    fields={['formatted_address', 'address_components', 'geometry']}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Pickup Address"
+                      value={typedAddress}
+                      onChange={(e) => setTypedAddress(e.target.value)}
+                      className="commit-form-input"
+                    />
+                  </Autocomplete>
+                </div>
+
+                <button onClick={handleCommitDonation} className="modal-confirm-button">
+                  Submit
+                </button>
+              </div>
+            )}
 
             {userType === 'donor' && (
               <button onClick={handleShowQuantityModal} className="modal-commit-button">
@@ -253,33 +216,6 @@ function DonationRequestList({ requests, userType }) {
 
         .modal-cancel-button:hover {
           background-color: #bbb;
-        }
-
-        .commit-form-input {
-          display: block;
-          width: 100%;
-          margin-bottom: 1rem;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          box-sizing: border-box;
-        }
-
-        .commit-form-input[type=number]::-webkit-inner-spin-button,
-        .commit-form-input[type=number]::-webkit-outer-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-
-        .commit-form-input[type=number] {
-          -moz-appearance: textfield;
-        }
-
-        .autocomplete-container {
-          width: 100%;
-          box-sizing: border-box;
-          margin-bottom: 1rem;
         }
       `}</style>
     </div>
