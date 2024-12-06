@@ -139,7 +139,11 @@ function PickupRequestsList({ pickupRequests }) {
               <p><strong>Travel Time:</strong> {Math.round(selectedTime / 60)} minutes</p>
             )}
 
-            <button className="modal-commit-button">Accept Delivery</button>
+            {/* Close the modal on Accept Delivery */}
+            <button className="modal-commit-button" onClick={handleCloseDetailsModal}>
+              Accept Delivery
+            </button>
+
             <button onClick={handleCloseDetailsModal} className="modal-cancel-button">
               Close
             </button>
