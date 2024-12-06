@@ -8,7 +8,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import { LoadScript } from '@react-google-maps/api';
 
-const libraries = ['places'];
+const libraries = ['places', 'geometry'];
 
 function App() {
   return (

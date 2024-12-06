@@ -1,137 +1,203 @@
-import React, { useState } from 'react';
-import { commitDonation } from '../api';
-import { Autocomplete } from '@react-google-maps/api';
+import React, { useState, useEffect } from 'react';
+import { Autocomplete, DistanceMatrixService } from '@react-google-maps/api';
 
-function PickupRequestsList({ pickupRequests, userType }) {
+function PickupRequestsList({ pickupRequests }) {
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [showCommitForm, setShowCommitForm] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+  // Address modal
+  const [showAddressModal, setShowAddressModal] = useState(false);
   const [typedAddress, setTypedAddress] = useState('');
   const [finalAddress, setFinalAddress] = useState('');
+  const [driverAutocomplete, setDriverAutocomplete] = useState(null);
 
-  const [commitQuantity, setCommitQuantity] = useState('');
+  // Travel times: { [requestId]: number (seconds) }
+  const [travelTimesById, setTravelTimesById] = useState({});
 
-  let pickupAutocomplete = null;
+  // Calculation states
+  const [calculating, setCalculating] = useState(false);
+  const [firstMatrixDone, setFirstMatrixDone] = useState(false);
+  const [driverToPickupResults, setDriverToPickupResults] = useState(null);
+
+  const pickupAddresses = pickupRequests.map(r => r.pickupAddress);
+  const dropoffAddresses = pickupRequests.map(r => r.address);
 
   const handleItemClick = (request) => {
     setSelectedRequest(request);
-    setShowCommitForm(false);
-    setTypedAddress('');
-    setFinalAddress('');
-    setCommitQuantity('');
+    setShowDetailsModal(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseDetailsModal = () => {
+    setShowDetailsModal(false);
     setSelectedRequest(null);
-    setShowCommitForm(false);
-    setTypedAddress('');
-    setFinalAddress('');
-    setCommitQuantity('');
   };
 
-  const handleShowCommitForm = () => {
-    setShowCommitForm(true);
-  };
-
-  const handleCommitDonation = async () => {
-    const addressToUse = finalAddress || typedAddress;
-
-    if (!addressToUse || !commitQuantity) {
-      alert("Please fill in both Pickup Address and Quantity.");
-      return;
-    }
-
-    try {
-      await commitDonation(selectedRequest._id, addressToUse, commitQuantity);
-      alert("Pickup request updated successfully!");
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error committing donation:", error);
-      alert("Error committing donation. Please try again.");
-    }
-  };
-
-  const handlePickupPlaceChanged = () => {
-    if (pickupAutocomplete) {
-      const place = pickupAutocomplete.getPlace();
+  const handleDriverPlaceChanged = () => {
+    if (driverAutocomplete) {
+      const place = driverAutocomplete.getPlace();
       if (place && place.formatted_address) {
-        const fullAddress = place.formatted_address.replace(/, USA$/, '');
-        setTypedAddress(fullAddress);
-        setFinalAddress(fullAddress);
+        setTypedAddress(place.formatted_address);
       }
     }
   };
 
+  const handleConfirmAddress = () => {
+    if (!typedAddress) {
+      alert("Please select your address from suggestions.");
+      return;
+    }
+    setFinalAddress(typedAddress);
+    setShowAddressModal(false);
+
+    if (pickupRequests.length > 0) {
+      setCalculating(true);
+      setFirstMatrixDone(false);
+      setDriverToPickupResults(null);
+    }
+  };
+
+  const shouldRunFirstMatrix = finalAddress && calculating && !firstMatrixDone && pickupRequests.length > 0;
+  const shouldRunSecondMatrix = finalAddress && calculating && firstMatrixDone && driverToPickupResults && pickupRequests.length > 0;
+
+  const handleFirstMatrix = (response, status) => {
+    if (status === 'OK' && response && response.rows.length > 0 && response.rows[0].elements.length === pickupRequests.length) {
+      const elements = response.rows[0].elements; 
+      const durations = elements.map(e => (e.status === 'OK' ? e.duration.value : null));
+      setDriverToPickupResults(durations);
+      setFirstMatrixDone(true);
+    } else {
+      alert("Error calculating driver->pickup times. Check addresses or try again.");
+      setCalculating(false);
+    }
+  };
+
+  const handleSecondMatrix = (response, status) => {
+    if (status === 'OK' && response && response.rows.length === pickupRequests.length) {
+      let newTimes = {};
+      for (let i = 0; i < pickupRequests.length; i++) {
+        const row = response.rows[i];
+        if (row && row.elements && row.elements.length === pickupRequests.length) {
+          const element = row.elements[i]; 
+          if (element.status === 'OK' && driverToPickupResults[i] !== null) {
+            const totalTime = driverToPickupResults[i] + element.duration.value;
+            newTimes[pickupRequests[i]._id] = totalTime;
+          } else {
+            newTimes[pickupRequests[i]._id] = null;
+          }
+        } else {
+          newTimes[pickupRequests[i]._id] = null;
+        }
+      }
+      setTravelTimesById(newTimes);
+    } else {
+      alert("Error calculating pickup->dropoff times. Check addresses or try again.");
+    }
+    setCalculating(false);
+  };
+
+  const selectedTime = selectedRequest ? travelTimesById[selectedRequest._id] : null;
+
   return (
     <div>
       <h2>Pickup Requests</h2>
+      {!finalAddress && (
+        <button onClick={() => setShowAddressModal(true)} className="set-address-button">Set Address</button>
+      )}
+      {calculating && <p>Calculating travel times for all requests...</p>}
+
       <ul>
-        {pickupRequests.map((request) => (
-          <li
-            key={request._id}
-            data-urgency={request.urgency}
-            onClick={() => handleItemClick(request)}
-            style={{ cursor: 'pointer' }}
-          >
-            {request.requestedItem} - {request.foodBankName} - {request.committedQuantity} - {request.urgency} - {request.address}
-          </li>
-        ))}
+        {pickupRequests.map((request) => {
+          const timeInSeconds = travelTimesById[request._id];
+          const timeDisplay = timeInSeconds ? ` - ${Math.round(timeInSeconds / 60)} minutes` : '';
+          return (
+            <li
+              key={request._id}
+              data-urgency={request.urgency}
+              onClick={() => handleItemClick(request)}
+              style={{ cursor: 'pointer' }}
+            >
+              {request.requestedItem} - {request.foodBankName} - {request.committedQuantity} - {request.urgency} - {request.address}
+              {timeDisplay}
+            </li>
+          );
+        })}
       </ul>
 
-      {selectedRequest && (
+      {/* Details Modal */}
+      {showDetailsModal && selectedRequest && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Request Details</h3>
+            <h3>Pickup Request Details</h3>
             <p><strong>Requested Item:</strong> {selectedRequest.requestedItem}</p>
             <p><strong>Food Bank Name:</strong> {selectedRequest.foodBankName}</p>
-            <p><strong>Quantity:</strong> {selectedRequest.commitedQuantity}</p>
+            <p><strong>Quantity:</strong> {selectedRequest.committedQuantity}</p>
             <p><strong>Urgency:</strong> {selectedRequest.urgency}</p>
             <p><strong>Pickup Address:</strong> {selectedRequest.pickupAddress}</p>
             <p><strong>Dropoff Address:</strong> {selectedRequest.address}</p>
 
-            {userType === 'donor' && !showCommitForm && (
-              <button onClick={handleShowCommitForm} className="modal-commit-button">
-                Commit Donation
-              </button>
+            {selectedTime && (
+              <p><strong>Travel Time:</strong> {Math.round(selectedTime / 60)} minutes</p>
             )}
 
-            {userType === 'donor' && showCommitForm && (
-              <div className="commit-form">
-                <input
-                  type="number"
-                  placeholder="Quantity"
-                  value={commitQuantity}
-                  onChange={(e) => setCommitQuantity(e.target.value)}
-                  className="commit-form-input"
-                />
-
-                <div className="autocomplete-container">
-                  <Autocomplete
-                    onLoad={(ref) => (pickupAutocomplete = ref)}
-                    onPlaceChanged={handlePickupPlaceChanged}
-                    fields={['formatted_address', 'address_components', 'geometry']}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Pickup Address"
-                      value={typedAddress}
-                      onChange={(e) => setTypedAddress(e.target.value)}
-                      className="commit-form-input"
-                    />
-                  </Autocomplete>
-                </div>
-
-                <button onClick={handleCommitDonation} className="modal-confirm-button">
-                  Submit
-                </button>
-              </div>
-            )}
-
-            <button onClick={handleCloseModal} className="modal-cancel-button">
+            <button className="modal-commit-button">Accept Delivery</button>
+            <button onClick={handleCloseDetailsModal} className="modal-cancel-button">
               Close
             </button>
           </div>
         </div>
+      )}
+
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Enter Your Current Address</h3>
+            <div className="commit-form">
+              <Autocomplete
+                onLoad={(ref) => setDriverAutocomplete(ref)}
+                onPlaceChanged={handleDriverPlaceChanged}
+                fields={['formatted_address', 'address_components', 'geometry']}
+              >
+                <input
+                  type="text"
+                  placeholder="Your Current Address"
+                  value={typedAddress}
+                  onChange={(e) => setTypedAddress(e.target.value)}
+                  className="commit-form-input"
+                />
+              </Autocomplete>
+
+              <button onClick={handleConfirmAddress} className="modal-confirm-button">
+                Confirm Address
+              </button>
+            </div>
+            <button onClick={() => setShowAddressModal(false)} className="modal-cancel-button">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {shouldRunFirstMatrix && (
+        <DistanceMatrixService
+          options={{
+            origins: [finalAddress],
+            destinations: pickupAddresses,
+            travelMode: 'DRIVING',
+          }}
+          callback={handleFirstMatrix}
+        />
+      )}
+
+      {shouldRunSecondMatrix && (
+        <DistanceMatrixService
+          options={{
+            origins: pickupAddresses,
+            destinations: dropoffAddresses,
+            travelMode: 'DRIVING',
+          }}
+          callback={handleSecondMatrix}
+        />
       )}
 
       <style jsx>{`
@@ -174,7 +240,6 @@ function PickupRequestsList({ pickupRequests, userType }) {
         .modal-commit-button {
           background-color: #007bff;
         }
-
         .modal-commit-button:hover {
           background-color: #0056b3;
         }
@@ -182,7 +247,6 @@ function PickupRequestsList({ pickupRequests, userType }) {
         .modal-confirm-button {
           background-color: #28a745;
         }
-
         .modal-confirm-button:hover {
           background-color: #218838;
         }
@@ -191,7 +255,6 @@ function PickupRequestsList({ pickupRequests, userType }) {
           background-color: #ccc;
           color: #000;
         }
-
         .modal-cancel-button:hover {
           background-color: #bbb;
         }
@@ -201,11 +264,6 @@ function PickupRequestsList({ pickupRequests, userType }) {
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .autocomplete-container {
           width: 100%;
           box-sizing: border-box;
         }
@@ -220,14 +278,19 @@ function PickupRequestsList({ pickupRequests, userType }) {
           box-sizing: border-box;
         }
 
-        .commit-form-input[type=number]::-webkit-inner-spin-button,
-        .commit-form-input[type=number]::-webkit-outer-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
+        .set-address-button {
+          background-color: #28a745;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          font-weight: bold;
+          margin-bottom: 1rem;
         }
 
-        .commit-form-input[type=number] {
-          -moz-appearance: textfield;
+        .set-address-button:hover {
+          background-color: #218838;
         }
       `}</style>
     </div>
