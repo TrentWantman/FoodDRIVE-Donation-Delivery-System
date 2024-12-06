@@ -14,6 +14,9 @@ function PickupRequestsList({ pickupRequests }) {
   // Travel times: { [requestId]: number (seconds) }
   const [travelTimesById, setTravelTimesById] = useState({});
 
+  // Track accepted deliveries: { [requestId]: boolean }
+  const [acceptedDeliveries, setAcceptedDeliveries] = useState({});
+
   // Calculation states
   const [calculating, setCalculating] = useState(false);
   const [firstMatrixDone, setFirstMatrixDone] = useState(false);
@@ -97,6 +100,12 @@ function PickupRequestsList({ pickupRequests }) {
 
   const selectedTime = selectedRequest ? travelTimesById[selectedRequest._id] : null;
 
+  const handleAcceptDelivery = () => {
+    if (!selectedRequest) return;
+    setAcceptedDeliveries(prev => ({ ...prev, [selectedRequest._id]: true }));
+    handleCloseDetailsModal();
+  };
+
   return (
     <div>
       <h2>Pickup Requests</h2>
@@ -108,7 +117,14 @@ function PickupRequestsList({ pickupRequests }) {
       <ul>
         {pickupRequests.map((request) => {
           const timeInSeconds = travelTimesById[request._id];
-          const timeDisplay = timeInSeconds ? ` - ${Math.round(timeInSeconds / 60)} minutes` : '';
+          let extraInfo = '';
+          if (timeInSeconds) {
+            extraInfo = ` - ${Math.round(timeInSeconds / 60)} minutes`;
+            if (acceptedDeliveries[request._id]) {
+              extraInfo += ' - Delivery Accepted';
+            }
+          }
+          
           return (
             <li
               key={request._id}
@@ -116,8 +132,7 @@ function PickupRequestsList({ pickupRequests }) {
               onClick={() => handleItemClick(request)}
               style={{ cursor: 'pointer' }}
             >
-              {request.requestedItem} - {request.foodBankName} - {request.committedQuantity} - {request.urgency} - {request.address}
-              {timeDisplay}
+              {request.requestedItem} - {request.foodBankName} - {request.committedQuantity} - {request.urgency}{extraInfo}
             </li>
           );
         })}
@@ -139,8 +154,8 @@ function PickupRequestsList({ pickupRequests }) {
               <p><strong>Travel Time:</strong> {Math.round(selectedTime / 60)} minutes</p>
             )}
 
-            {/* Close the modal on Accept Delivery */}
-            <button className="modal-commit-button" onClick={handleCloseDetailsModal}>
+            {/* Close the modal on Accept Delivery and mark as accepted */}
+            <button className="modal-commit-button" onClick={handleAcceptDelivery}>
               Accept Delivery
             </button>
 
