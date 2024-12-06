@@ -10,7 +10,8 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const auth = require('./authMiddleware');
-const { getUser, getUserByUserId, getDonationRequests, createPickupRequest} = require('./db');
+const { getUser, getUserByUserId, getDonationRequests, createPickupRequest, getPickupRequests} = require('./db');
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -50,6 +51,17 @@ app.post('/api/donations/commit', auth, async (req, res) => {
 		}
 		res.status(500).json({ error: 'Internal server error' });
 	}
+});
+
+app.get('/api/pickupRequests', auth, async (req, res) => {
+    try {
+        // You can add query filters if needed, for now just return all
+        const requests = await getPickupRequests({});
+        res.json(requests);
+    } catch (error) {
+        console.error('Error fetching pickup requests:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // Endpoint to get donation requests

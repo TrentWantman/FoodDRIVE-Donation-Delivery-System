@@ -100,5 +100,14 @@ async function createPickupRequest(originalRequestId, pickupAddress, committedQu
 	return result.insertedId;
 }
 
-module.exports = { getUserByUsername, getUserByUserId, addUser, addDonationRequest, getDonationRequests, getDonationRequestsByUser, createPickupRequest};
+async function getPickupRequests(query = {}, limit = 25) {
+    const requests_cursor = pickupRequests_collection.find(query, { limit });
+    let requests = [];
+    for await (const request of requests_cursor) {
+        requests.push(request);
+    }
+    return requests;
+}
+
+module.exports = { getUserByUsername, getUserByUserId, addUser, addDonationRequest, getDonationRequests, getDonationRequestsByUser, createPickupRequest, getPickupRequests};
 

@@ -40,3 +40,13 @@ export const commitDonation = async (id, pickupAddress, quantity) => {
 	  throw error;
 	}
   };
+
+  export const getPickupRequests = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/api/pickupRequests`, { withCredentials: true });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching pickup requests:", error);
+        return [];
+    }
+};
