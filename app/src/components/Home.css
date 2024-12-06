@@ -1,35 +1,182 @@
-/* src/components/Home.css */
+/* Home.css */
+
+/* General Layout */
 .home-container {
-    display: flex;
+  font-family: 'Arial', sans-serif;
+  color: #333; /* Default dark gray text */
+  text-align: center;
+}
+
+h1, h2, h3, p {
+  color: rgb(0, 0, 0);
+}
+
+.normal_text{
+  color:rgb(0, 0, 0);
+}
+
+/* Hero Section */
+.hero-section {
+  background: url('https://example.com/hero-image.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.hero-text {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 80%;
+  width: 600px;
+}
+
+.home-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: white; /* White color for title */
+}
+
+.home-description {
+  font-size: 1.2rem;
+  color: white; /* White color for description */
+  margin-bottom: 30px;
+}
+
+.home-button {
+  background-color: #28a745;
+  color: white;
+  font-size: 1.2rem;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+  background-color: #00ff15;
+}
+
+/* About Section */
+.about-section {
+  background-color: #f4f4f4;
+  padding: 40px;
+}
+
+.about-section h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #000; /* Ensure headings are black */
+}
+
+.about-section p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  color: #333; /* Default text color */
+}
+
+/* Team Section */
+.team-section, .how-it-works-section, .mission-section {
+  padding: 40px 20px;
+  background-color: #ffffff;
+}
+
+.team-section h2, .how-it-works-section h2, .mission-section h2 {
+  font-size: 2.5rem;
+  color: #000; /* Ensure headings are black */
+  margin-bottom: 20px;
+}
+
+.team-section ul {
+  list-style-type: none;
+  font-size: 1.2rem;
+  color: #333; /* Default text color */
+}
+
+/* How it Works Section */
+.how-it-works {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.how-it-card {
+  background-color: #f4f4f4;
+  padding: 20px;
+  width: 250px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.how-it-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #000; /* Ensure titles in the cards are black */
+}
+
+.how-it-card p {
+  font-size: 1rem;
+  color: #555; /* Lighter text color for card content */
+}
+
+/* CTA Section */
+.cta-section {
+  background-color: #420f5f;
+  color: white;
+  padding: 40px;
+}
+
+.cta-section h2 {
+  font-size: 2.5rem;
+  color: #d6c9c9; /* Lighter color for heading */
+  margin-bottom: 20px;
+}
+
+.cta-section p {
+  font-size: 1.2rem;
+  color: #d6c9c9; /* Lighter color for paragraph text */
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.cta-section .home-button {
+  background-color: white;
+  color: #3b0e6e;
+  font-size: 1.2rem;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cta-section .home-button:hover {
+  background-color: #3c187e;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .hero-text {
+    width: 100%;
+    padding: 100px;
+  }
+  .home-title {
+    font-size: 2rem;
+  }
+  .home-description {
+    font-size: 1rem;
+  }
+  .how-it-works {
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f0c040;
-    text-align: center;
   }
-  
-  h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+  .how-it-card {
+    width: 90%;
+    margin-bottom: 20px;
   }
-  
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .home-button {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    border: none;
-    background-color: #333;
-    color: white;
-    border-radius: 5px;
-  }
-  
-  .home-button:hover {
-    background-color: #555;
-  }
-  
+}
